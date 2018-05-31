@@ -41,7 +41,7 @@ const supportLang = {
 
 const init = function () {
     console.log("Page Init...");
-    $('pre code').each(function(i, block) {
+    $('pre code').each(function (i, block) {
         hljs.highlightBlock(block);
     });
 
@@ -50,12 +50,13 @@ const init = function () {
         $("#total").text(resp);
     });
     callNeb("getLatest", "", function (resp) {
-        if (resp) {
+        if (resp && resp !== "null") {
             console.log("Latest:" + resp);
+            resp = JSON.parse(resp);
             $("#latest").text(resp.title);
-            $("#latest").attr("href", "./index.html?id="+resp.id);
+            $("#latest").attr("href", "./index.html?id=" + resp.id);
         }
-        else{
+        else {
             console.log("Latest: None");
         }
     });
@@ -63,18 +64,42 @@ const init = function () {
         $("#codeContent").hide();
         $("#notFound").hide();
         const id = $("#snippetIdInput").val();
-        callNeb("loadSnippet", "[" + id + "]", function (resp) {
-            if (resp.err != ""){
+        callNeb("loadSnippetWithId", "[" + id + "]", function (resp) {
+            console.log(resp);
+            if (!resp.startsWith("{")) {
+                $("#notFound").show();
+                return;
+            }
+            resp = JSON.parse(resp);
+            if (resp.err !== "") {
                 $("#notFound").show();
                 return;
             }
             $("#codeContent").show();
-            $("#codeBlock").attr("class", "json");
-            $("#codeBlock").html(resp.data);
-            $('pre code').each(function(i, block) {
-                hljs.highlightBlock(block);
-            });
+            const data = JSON.parse(resp.data);
+            setCodeContent(data);
+        }, function (err) {
+            alert(err);
+        });
+    });
+    $("#searchTitle").click(function () {
+        $("#codeContent").hide();
+        $("#notFound").hide();
+        const title = $("#snippetIdInput").val();
+        callNeb("loadSnippetWithTitle", "[\"" + title + "\"]", function (resp) {
             console.log(resp);
+            if (!resp.startsWith("{")) {
+                $("#notFound").show();
+                return;
+            }
+            resp = JSON.parse(resp);
+            if (resp.err !== "") {
+                $("#notFound").show();
+                return;
+            }
+            $("#codeContent").show();
+            const data = JSON.parse(resp.data);
+            setCodeContent(data);
         }, function (err) {
             alert(err);
         });
@@ -83,17 +108,19 @@ const init = function () {
         $("#codeContent").hide();
         $("#notFound").hide();
         callNeb("loadRandom", "", function (resp) {
-            if (resp.err != ""){
+            console.log(resp);
+            if (!resp.startsWith("{")) {
+                $("#notFound").show();
+                return;
+            }
+            resp = JSON.parse(resp);
+            if (resp.err !== "") {
                 $("#notFound").show();
                 return;
             }
             $("#codeContent").show();
-            $("#codeBlock").attr("class", "json");
-            $("#codeBlock").html(resp.data);
-            $('pre code').each(function(i, block) {
-                hljs.highlightBlock(block);
-            });
-            console.log(resp);
+            const data = JSON.parse(resp.data);
+            setCodeContent(data);
         }, function (err) {
             alert(err);
         });
@@ -106,35 +133,50 @@ const init = function () {
         ];
         callNebPay("saveSnippet", JSON.stringify(args), function (resp) {
             console.log(resp);
-            alert("上传成功: "+resp);
+            alert("上传成功: " + resp);
         })
     });
     for (let i in supportLang) {
         $("#codeLanguage").append("<option value='" + supportLang[i] + "'>" + i + "</option>");
     }
 
-    if (getQueryParam("id")) {
-        console.log(getQueryParam("id"));
-        callNeb("loadSnippet", "[" + id + "]", function (resp) {
-            if (resp.err != ""){
+    const queryId = getQueryParam("id");
+    if (queryId) {
+        console.log(queryId);
+        callNeb("loadSnippetWithId", "[" + queryId + "]", function (resp) {
+            console.log(resp);
+            if (!resp.startsWith("{")) {
+                $("#notFound").show();
+                return;
+            }
+            resp = JSON.parse(resp);
+            if (resp.err !== "") {
                 $("#notFound").show();
                 return;
             }
             $("#codeContent").show();
-            $("#codeBlock").attr("class", "json");
-            $("#codeBlock").html(resp.data);
-            $('pre code').each(function(i, block) {
-                hljs.highlightBlock(block);
-            });
-            console.log(resp);
+            const data = JSON.parse(resp.data);
+            setCodeContent(data);
         });
     }
 };
 
-const dappContactAddress = "";
+const setCodeContent = function (data) {
+    $("#codeContentId").text(data.id);
+    $("#codeContentTitle").text(data.title);
+    $("#codeContentAuthor").text(data.author);
+    $("#codeContentDate").text((new Date(data.createDate)).toLocaleString());
+    $("#codeBlock").attr("class", data.language);
+    $("#codeBlock").text(data.content);
+    $('pre code').each(function (i, block) {
+        hljs.highlightBlock(block);
+    });
+};
+
+const dappContactAddress = "n1eYktmwXg8nJzNpSg1VMnK2u7WveQpPqsT";
 const nebulas = require("nebulas");
 const neb = new nebulas.Neb();
-neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
+neb.setRequest(new nebulas.HttpRequest("https://mainnet.nebulas.io"));
 const NebPay = require("nebpay");
 const nebPay = new NebPay();
 

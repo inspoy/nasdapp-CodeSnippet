@@ -6,3 +6,8 @@ body{
 .sep{
     height: 50px;
 }
+
+.fat{
+    padding-left: 10px;
+    padding-right: 30px;
+}

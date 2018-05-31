@@ -49,6 +49,7 @@
         </div>
         <div class="col-md-9">
             <button class="btn btn-primary" id="searchId">按ID查找</button>
+            <button class="btn btn-primary" id="searchTitle">按标题查找</button>
             <button class="btn btn-success" id="getRandom">手气不错</button>
         </div>
     </div>
@@ -60,6 +61,9 @@
         啊。。貌似没有找到你需要的东西哦
     </div>
     <div id="codeContent" style="display: none">
+        <p><span class="label label-default">ID</span><span class="fat" id="codeContentId"></span> <span class="label label-default">Title</span><span class="fat" id="codeContentTitle"></span></p>
+        <p><span class="label label-default">Author</span><span class="fat" id="codeContentAuthor"></span></p>
+        <p><span class="label label-default">CreateDate</span><span class="fat" id="codeContentDate"></span></p>
             <pre style="background-color: #222">
                 <code id="codeBlock">
 
@@ -71,7 +75,7 @@
     <form>
         <div class="form-group">
             <label for="codeTitle">标题</label>
-            <input type="email" class="form-control" id="codeTitle" placeholder="输入代码片标题">
+            <input class="form-control" id="codeTitle" placeholder="输入代码片标题">
         </div>
         <div class="form-group">
             <label for="codeLanguage">语言</label>
@@ -84,6 +88,7 @@
         </div>
         <div class="sep"></div>
         <button class="btn btn-primary" id="codeUpload">上传</button>
+        <p>&gt;&nbsp;你必须安装钱包插件才能上传（如已安装请忽略）</p>
     </form>
     <hr>
     <p>Developed by inspoy</p>

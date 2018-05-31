@@ -21,17 +21,33 @@ SnippetContract.prototype = {
         this.latest = "";
     },
 
-    loadSnippet: function (id) {
+    loadSnippetWithId: function (id) {
         const item = this.data.get(id);
         const ret = {
             err: "",
             data: ""
         };
-        if (gameData) {
+        if (item) {
             ret.data = JSON.stringify(item);
         }
         else {
             ret.err = "找不到数据";
+        }
+        return ret;
+    },
+
+    loadSnippetWithTitle: function (title) {
+        const ret = {
+            err: "找不到数据",
+            data: ""
+        };
+        for (let id = 1001; id <= 1000 + this.totalSnippets; ++id) {
+            const item = this.data.get(id);
+            if (item && item.title === title) {
+                ret.err = "";
+                ret.data = JSON.stringify(item);
+                break;
+            }
         }
         return ret;
     },
@@ -44,7 +60,7 @@ SnippetContract.prototype = {
             }
         }
         const idx = Math.round(Math.random() * this.totalSnippets - 1);
-        return this.loadSnippet(1001 + idx);
+        return this.loadSnippetWithId(1001 + idx);
     },
 
     saveSnippet: function (title, lang, content) {
@@ -72,7 +88,7 @@ SnippetContract.prototype = {
     },
 
     getLatest: function () {
-        if (this.totalSnippets <= 0){
+        if (this.totalSnippets <= 0) {
             return null;
         }
         return {
@@ -81,3 +97,5 @@ SnippetContract.prototype = {
         };
     },
 };
+
+module.exports = SnippetContract;
